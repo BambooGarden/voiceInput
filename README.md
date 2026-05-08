@@ -30,15 +30,79 @@
 
 ## Architecture
 
+```mermaid
+flowchart LR
+    subgraph Input
+        MIC[🎙️ Microphone<br/>16kHz Mono]
+    end
+
+    subgraph Processing Pipeline
+        direction LR
+        VAD[🔇 VAD<br/><sub>Silero</sub>]
+        SPK[👤 Speaker ID<br/><sub>pyannote</sub>]
+        ASR[📝 ASR<br/><sub>faster-whisper</sub>]
+        INT[🧠 Intent<br/><sub>LLM</sub>]
+        CLN[✨ Cleanup<br/><sub>Regex + LLM</sub>]
+    end
+
+    subgraph Output
+        TXT[⌨️ Clean Text]
+    end
+
+    MIC --> VAD
+    VAD -->|speech| SPK
+    VAD -.->|silence| DROP[🗑️ Drop]
+    SPK -->|target speaker| ASR
+    SPK -.->|other speaker| NOISE[🔇 Ignore]
+    ASR --> INT
+    INT -->|input| CLN
+    INT -->|correction| CLN
+    INT -->|command| CLN
+    INT -.->|noise| NOISE2[🔇 Ignore]
+    CLN --> TXT
+
+    style MIC fill:#1a5276,stroke:#2980b9,color:#fff
+    style VAD fill:#1b4332,stroke:#52b788,color:#fff
+    style SPK fill:#4a1942,stroke:#e040fb,color:#fff
+    style ASR fill:#0f3460,stroke:#4ecdc4,color:#fff
+    style INT fill:#4a3728,stroke:#f39c12,color:#fff
+    style CLN fill:#1a3a5c,stroke:#64b5f6,color:#fff
+    style TXT fill:#1b4332,stroke:#52b788,color:#fff
+    style DROP fill:#333,stroke:#666,color:#888
+    style NOISE fill:#333,stroke:#666,color:#888
+    style NOISE2 fill:#333,stroke:#666,color:#888
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Voice Input Pipeline                       │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│   Microphone ──► VAD ──► Speaker ID ──► ASR ──► Intent ──► Clean │
-│   (16kHz)     (Silero) (pyannote)  (Whisper) (LLM)     (Output) │
-│                                                                   │
-└─────────────────────────────────────────────────────────────────┘
+
+```mermaid
+flowchart TB
+    subgraph Speaker Enrollment
+        direction LR
+        REC[🎙️ Record Samples] --> EMB[📐 Compute Embedding<br/><sub>pyannote/embedding</sub>]
+        EMB --> AVG[📊 Mean + Normalize]
+        AVG --> SAVE[💾 Save Profile<br/><sub>.npy</sub>]
+    end
+
+    subgraph LLM Intent Engine
+        direction LR
+        RAW[Raw Text] --> LLM{LLM Backend}
+        LLM -->|Ollama| Q[qwen2.5:3b<br/><sub>Local, Free</sub>]
+        LLM -->|OpenAI| G[gpt-4o-mini]
+        LLM -->|Claude| C[claude-3.5-sonnet]
+        Q --> JSON[JSON Response<br/><sub>text + intent</sub>]
+        G --> JSON
+        C --> JSON
+    end
+
+    style REC fill:#1a5276,stroke:#2980b9,color:#fff
+    style EMB fill:#4a1942,stroke:#e040fb,color:#fff
+    style AVG fill:#0f3460,stroke:#4ecdc4,color:#fff
+    style SAVE fill:#1b4332,stroke:#52b788,color:#fff
+    style RAW fill:#333,stroke:#888,color:#fff
+    style LLM fill:#4a3728,stroke:#f39c12,color:#fff
+    style Q fill:#1b4332,stroke:#52b788,color:#fff
+    style G fill:#1a3a5c,stroke:#64b5f6,color:#fff
+    style C fill:#4a1942,stroke:#e040fb,color:#fff
+    style JSON fill:#0f3460,stroke:#4ecdc4,color:#fff
 ```
 
 | Stage | Technology | Purpose |
