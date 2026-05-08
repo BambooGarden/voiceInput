@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/)",
+      "Bash(brew services *)",
+      "Bash(ollama list *)",
+      "Bash(ollama pull *)",
+      "Bash(ollama run *)",
+      "Bash(curl -s http://localhost:8000/)",
+      "Bash(curl -s http://localhost:11434/api/chat -d '{\"model\":\"qwen2.5:3b\",\"messages\":[{\"role\":\"user\",\"content\":\"say hi\"}],\"stream\":false}')",
+      "Read(//Users/ice/.ollama/models/manifests/registry.ollama.ai/library/**)",
+      "Read(//Users/ice/.cache/**)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

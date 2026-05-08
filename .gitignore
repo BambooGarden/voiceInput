@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.egg
+.pytest_cache/
+data/speaker_profiles/*.npy
+data/speaker_profiles/*.json
+.DS_Store
