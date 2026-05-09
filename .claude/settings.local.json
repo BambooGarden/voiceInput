@@ -11,7 +11,13 @@
       "Read(//Users/ice/.ollama/models/manifests/registry.ollama.ai/library/**)",
       "Read(//Users/ice/.cache/**)",
       "Bash(git init *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(echo \".DS_Store\")",
+      "Bash(git commit *)",
+      "Bash(gh auth *)",
+      "Bash(gh repo *)",
+      "Bash(git push *)"
     ]
   }
 }
